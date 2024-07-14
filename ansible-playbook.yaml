@@ -1,0 +1,22 @@
+- name: Configure docker on EC2
+  hosts: BNK-UAT-Server
+  become: yes
+  connection: ssh
+  tasks:
+    - name: Update apt
+      apt:
+        update_cache: yes
+
+    - name: Install docker
+      apt:
+        name: docker.io
+        state: present
+        update_cache: yes
+
+    - name: Start Docker service
+      service:
+        name: docker
+        state: started
+
+    - name: Deploy Docker Container
+      command: docker run -d -p 8084:8081 nandusathyan/banking-app:latest
