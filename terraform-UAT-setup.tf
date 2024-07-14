@@ -13,7 +13,7 @@ provider "aws" {
 }
 
 # Create a VPC
-resource "aws_vpc" "BNKproj-vpc" {
+resource "aws_vpc" "proj-vpc" {
   cidr_block = "10.0.0.0/16"
 }
 
@@ -31,11 +31,11 @@ resource "aws_route_table" "BNKproject-rt" {
   route {
     # pointing to the internet
     cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.proj-ig.id
+    gateway_id = aws_internet_gateway.BNKproj-ig.id
   }
   route {
     ipv6_cidr_block = "::/0"
-    gateway_id      = aws_internet_gateway.proj-ig.id
+    gateway_id      = aws_internet_gateway.BNKproj-ig.id
   }
 
   tags = {
@@ -55,8 +55,8 @@ resource "aws_subnet" "BNKproj-subnet" {
 
 # Associating the subnet with the route table
 resource "aws_route_table_association" "BNKproj-rt-sub-assoc" {
-  subnet_id      = aws_subnet.proj-subnet.id
-  route_table_id = aws_route_table.project-rt.id
+  subnet_id      = aws_subnet.BNKproj-subnet.id
+  route_table_id = aws_route_table.BNKproject-rt.id
 }
 
 # Creating a security group
@@ -104,15 +104,15 @@ resource "aws_security_group" "BNKproj-sg" {
 
 # Create a new network interface
 resource "aws_network_interface" "BNKproj-ni" {
-  subnet_id       = aws_subnet.proj-subnet.id
+  subnet_id       = aws_subnet.BNKproj-subnet.id
   private_ips     = ["10.0.1.10"]
-  security_groups = [aws_security_group.proj-sg.id]
+  security_groups = [aws_security_group.BNKproj-sg.id]
 }
 
 # Attaching an elastic IP to the network interface
 resource "aws_eip" "BNKproj-eip" {
   vpc                      = true
-  network_interface        = aws_network_interface.proj-ni.id
+  network_interface        = aws_network_interface.BNKproj-ni.id
   associate_with_private_ip = "10.0.1.10"
 }
 
@@ -125,7 +125,7 @@ resource "aws_instance" "BNK-UAT-Server" {
 
   network_interface {
     device_index          = 0
-    network_interface_id = aws_network_interface.proj-ni.id
+    network_interface_id  = aws_network_interface.BNKproj-ni.id
   }
 
   user_data = <<-EOF
